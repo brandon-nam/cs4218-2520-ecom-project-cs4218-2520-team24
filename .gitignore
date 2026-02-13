@@ -4,4 +4,8 @@ node_modules
 /blob-report/
 /playwright/.cache/
 
+# Ignore IDE config files
+.idea
+.vscode
+
 .env
