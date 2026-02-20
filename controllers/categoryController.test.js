@@ -10,7 +10,7 @@ import {
 } from "./categoryController";
 
 jest.mock("../models/categoryModel")
-jest.mock("slugify")
+jest.mock("slugify", () => jest.fn((name) => name.toLowerCase()));
 
 describe('createCategoryController', () => {
     beforeEach(() => {
