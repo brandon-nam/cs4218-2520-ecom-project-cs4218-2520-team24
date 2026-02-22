@@ -5,6 +5,8 @@ Nam Dohyun, A0226590A
 - Wrote unit tests for productController.js 
 - Wrote unit tests for pages/ UI files
 
+Choo Jia Rong, A0257352A
+- Wrote unit tests for authHelper.js and authMiddleware.js
 
 ## 1. Project Introduction
 
