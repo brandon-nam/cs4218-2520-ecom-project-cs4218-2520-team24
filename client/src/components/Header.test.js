@@ -1,3 +1,4 @@
+// Leong Yu Jun Nicholas A0257284W
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -90,6 +91,7 @@ describe("Header Component", () => {
     );
 
     const dashboardLink = screen.getByText("Dashboard");
+    
     expect(dashboardLink).toHaveAttribute("href", "/dashboard/admin");
   });
 

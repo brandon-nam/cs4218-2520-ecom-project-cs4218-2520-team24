@@ -1,3 +1,4 @@
+// Leong Yu Jun Nicholas A0257284W
 import React from "react";
 import { render, screen, act } from "@testing-library/react";
 import { MemoryRouter, useNavigate, useLocation } from "react-router-dom";
@@ -18,15 +19,11 @@ describe("Spinner Component", () => {
     jest.useFakeTimers();
     mockNavigate = jest.fn();
     mockLocation = { pathname: "/current-path" };
-    
     useNavigate.mockReturnValue(mockNavigate);
     useLocation.mockReturnValue(mockLocation);
   });
 
   afterEach(() => {
-    act(() => {
-      jest.runOnlyPendingTimers();
-    });
     jest.useRealTimers();
     jest.clearAllMocks();
   });

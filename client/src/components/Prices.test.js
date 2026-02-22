@@ -1,9 +1,14 @@
+// Leong Yu Jun Nicholas A0257284W
 import { Prices } from "./Prices";
 
 describe("Prices Array", () => {
-  it("should be an array of price range objects", () => {
-    expect(Array.isArray(Prices)).toBe(true);
-    expect(Prices.length).toBeGreaterThan(0);
+
+it("should be an array of price range objects", () => {
+    const isArray = Array.isArray(Prices);
+    const length = Prices.length;
+
+    expect(isArray).toBe(true);
+    expect(length).toBeGreaterThan(0);
   });
 
   it("should contain objects with _id, name, and array properties", () => {
@@ -22,13 +27,16 @@ describe("Prices Array", () => {
   });
 
   it("should have correct specific price ranges", () => {
-    expect(Prices[0]).toEqual({
+    const firstPrice = Prices[0];
+    const lastPrice = Prices.at(-1);
+
+    expect(firstPrice).toEqual({
       _id: 0,
       name: "$0 to 19",
       array: [0, 19],
     });
 
-    expect(Prices.at(-1)).toEqual({
+    expect(lastPrice).toEqual({
       _id: 5,
       name: "$100 or more",
       array: [100, 9999],
