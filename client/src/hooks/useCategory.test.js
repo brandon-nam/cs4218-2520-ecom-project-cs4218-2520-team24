@@ -1,3 +1,4 @@
+// Leong Yu Jun Nicholas A0257284W
 import { renderHook, waitFor } from "@testing-library/react";
 import axios from "axios";
 import useCategory from "./useCategory";
@@ -5,8 +6,15 @@ import useCategory from "./useCategory";
 jest.mock("axios");
 
 describe("useCategory Hook", () => {
+  let consoleSpy;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    consoleSpy.mockRestore();
   });
 
   it("should fetch and return categories successfully", async () => {
@@ -37,9 +45,7 @@ describe("useCategory Hook", () => {
   });
 
   it("should handle API errors gracefully and return empty array", async () => {
-    const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
     const mockError = new Error("Network Error");
-    
     axios.get.mockRejectedValueOnce(mockError);
 
     const { result } = renderHook(() => useCategory());
@@ -57,7 +63,5 @@ describe("useCategory Hook", () => {
 
     expect(axios.get).toHaveBeenCalledWith("/api/v1/category/get-category");
     expect(axios.get).toHaveBeenCalledTimes(1);
-
-    consoleSpy.mockRestore();
   });
 });

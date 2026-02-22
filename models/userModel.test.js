@@ -1,7 +1,16 @@
+// Leong Yu Jun Nicholas A0257284W
 import mongoose from "mongoose";
 import User from "./userModel";
 
 describe("User Model Test", () => {
+  beforeEach(() => {
+    // Setup if needed
+  });
+
+  afterEach(() => {
+    // Teardown if needed
+  });
+
   it("should create a user successfully", () => {
     const userData = {
       name: "John Doe",
@@ -12,6 +21,7 @@ describe("User Model Test", () => {
       answer: "Blue",
     };
     const user = new User(userData);
+    
     const err = user.validateSync();
     
     expect(err).toBeUndefined();
@@ -21,6 +31,7 @@ describe("User Model Test", () => {
 
   it("should fail validation if required fields are missing", () => {
     const user = new User({});
+    
     const err = user.validateSync();
     
     expect(err.errors.name).toBeDefined();

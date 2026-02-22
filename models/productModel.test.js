@@ -1,7 +1,16 @@
+// Leong Yu Jun Nicholas A0257284W
 import mongoose from "mongoose";
 import Product from "./productModel";
 
 describe("Product Model Test", () => {
+  beforeEach(() => {
+    // Setup if needed
+  });
+
+  afterEach(() => {
+    // Teardown if needed
+  });
+
   it("should create a product successfully", () => {
     const productData = {
       name: "Test Product",
@@ -13,6 +22,7 @@ describe("Product Model Test", () => {
       shipping: true,
     };
     const product = new Product(productData);
+    
     const err = product.validateSync();
     
     expect(err).toBeUndefined();
@@ -21,6 +31,7 @@ describe("Product Model Test", () => {
 
   it("should fail validation if required fields are missing", () => {
     const product = new Product({});
+    
     const err = product.validateSync();
     
     expect(err.errors.name).toBeDefined();

@@ -1,3 +1,4 @@
+// Leong Yu Jun Nicholas A0257284W
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -5,12 +6,21 @@ import "@testing-library/jest-dom/extend-expect";
 import AdminMenu from "./AdminMenu";
 
 describe("AdminMenu Component", () => {
+  beforeEach(() => {
+    // Setup if needed
+  });
+
+  afterEach(() => {
+    // Teardown if needed
+  });
+
   it("renders the Admin Panel header", () => {
     render(
       <MemoryRouter>
         <AdminMenu />
       </MemoryRouter>
     );
+    
     expect(screen.getByText("Admin Panel")).toBeInTheDocument();
   });
 
@@ -21,7 +31,6 @@ describe("AdminMenu Component", () => {
       </MemoryRouter>
     );
 
-    // Check if all links are present
     const createCategoryLink = screen.getByRole("link", { name: /create category/i });
     const createProductLink = screen.getByRole("link", { name: /create product/i });
     const productsLink = screen.getByRole("link", { name: /^products$/i });
@@ -32,7 +41,6 @@ describe("AdminMenu Component", () => {
     expect(productsLink).toBeInTheDocument();
     expect(ordersLink).toBeInTheDocument();
 
-    // Check if links have correct href attributes
     expect(createCategoryLink).toHaveAttribute("href", "/dashboard/admin/create-category");
     expect(createProductLink).toHaveAttribute("href", "/dashboard/admin/create-product");
     expect(productsLink).toHaveAttribute("href", "/dashboard/admin/products");

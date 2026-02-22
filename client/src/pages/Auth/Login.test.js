@@ -150,12 +150,10 @@ describe('Login Component', () => {
             </MemoryRouter>
         );
 
-        // Act: Fill the form and click submit
         fireEvent.change(getByPlaceholderText('Enter Your Email'), { target: { value: 'wrong@example.com' } });
         fireEvent.change(getByPlaceholderText('Enter Your Password'), { target: { value: 'wrongpass' } });
         fireEvent.click(getByText('LOGIN'));
 
-        // Assert: Check if axios was called and the correct toast error appeared
         await waitFor(() => expect(axios.post).toHaveBeenCalled());
         
         // This targets the 'else' block in your handleSubmit

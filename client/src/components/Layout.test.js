@@ -1,3 +1,4 @@
+// Leong Yu Jun Nicholas A0257284W
 import React from "react";
 import { render, screen } from "@testing-library/react";
 import Layout from "./Layout";
@@ -11,12 +12,18 @@ jest.mock("react-hot-toast", () => ({
 }));
 
 describe("Layout Component", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    // Clean up any side effects if necessary
+  });
+
   it("renders Header, Footer, Toaster, and children", () => {
-    render(
-      <Layout>
-        <div data-testid="child-content">Child Content</div>
-      </Layout>
-    );
+    const childContent = <div data-testid="child-content">Child Content</div>;
+
+    render(<Layout>{childContent}</Layout>);
 
     expect(screen.getByTestId("header")).toBeInTheDocument();
     expect(screen.getByTestId("footer")).toBeInTheDocument();
@@ -26,16 +33,13 @@ describe("Layout Component", () => {
   });
 
   it("sets default Helmet props correctly", () => {
-    render(
-      <Layout>
-        <div>Content</div>
-      </Layout>
-    );
+    const childContent = <div>Content</div>;
 
+    render(<Layout>{childContent}</Layout>);
     const helmet = Helmet.peek();
-    expect(helmet.title).toBe("Ecommerce app - shop now");
-    
     const metaTags = helmet.metaTags;
+
+    expect(helmet.title).toBe("Ecommerce app - shop now");
     expect(metaTags).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ name: "description", content: "mern stack project" }),
@@ -46,21 +50,23 @@ describe("Layout Component", () => {
   });
 
   it("sets custom Helmet props correctly", () => {
+    const customProps = {
+      title: "Custom Title",
+      description: "Custom Description",
+      keywords: "custom, keywords",
+      author: "Custom Author"
+    };
+    const childContent = <div>Content</div>;
+
     render(
-      <Layout
-        title="Custom Title"
-        description="Custom Description"
-        keywords="custom, keywords"
-        author="Custom Author"
-      >
-        <div>Content</div>
+      <Layout {...customProps}>
+        {childContent}
       </Layout>
     );
-
     const helmet = Helmet.peek();
-    expect(helmet.title).toBe("Custom Title");
-    
     const metaTags = helmet.metaTags;
+
+    expect(helmet.title).toBe("Custom Title");
     expect(metaTags).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ name: "description", content: "Custom Description" }),

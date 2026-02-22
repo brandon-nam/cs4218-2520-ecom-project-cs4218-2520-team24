@@ -1,13 +1,23 @@
+// Leong Yu Jun Nicholas A0257284W
 import mongoose from "mongoose";
 import Order from "./orderModel";
 
 describe("Order Model Test", () => {
+  beforeEach(() => {
+    // Setup if needed
+  });
+
+  afterEach(() => {
+    // Teardown if needed
+  });
+
   it("should create an order with default status", () => {
     const orderData = {
       products: [new mongoose.Types.ObjectId()],
       payment: { success: true },
       buyer: new mongoose.Types.ObjectId(),
     };
+    
     const order = new Order(orderData);
     
     expect(order.status).toBe("Not Process");
@@ -20,6 +30,7 @@ describe("Order Model Test", () => {
       status: "Invalid Status",
     };
     const order = new Order(orderData);
+    
     const err = order.validateSync();
     
     expect(err.errors.status).toBeDefined();

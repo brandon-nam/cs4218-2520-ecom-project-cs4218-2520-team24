@@ -1,12 +1,22 @@
+// Leong Yu Jun Nicholas A0257284W
 import mongoose from "mongoose";
 import Category from "./categoryModel";
 
 describe("Category Model Test", () => {
+  beforeEach(() => {
+    // Setup if needed
+  });
+
+  afterEach(() => {
+    // Teardown if needed
+  });
+
   it("should create a category successfully", () => {
     const categoryData = {
       name: "Electronics",
       slug: "electronics",
     };
+    
     const category = new Category(categoryData);
     
     expect(category.name).toBe(categoryData.name);
@@ -22,6 +32,7 @@ describe("Category Model Test", () => {
     
     // Mongoose setters (like lowercase) are applied during validation or save
     category.validateSync();
+    
     expect(category.slug).toBe("books");
   });
 });
