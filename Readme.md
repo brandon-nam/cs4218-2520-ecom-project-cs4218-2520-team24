@@ -8,6 +8,11 @@ Nam Dohyun, A0226590A
 Choo Jia Rong, A0257352A
 - Wrote unit tests for authHelper.js and authMiddleware.js
 
+Leong Yu Jun Nicholas, A0257284W
+- Wrote unit tests for component files
+- Wrote unit tests for model files
+- Wrote unit tests for useCategory.js hook and db.js config file
+
 ## 1. Project Introduction
 
 Virtual Vault is a full-stack MERN (MongoDB, Express.js, React.js, Node.js) e-commerce website, offering seamless connectivity and user-friendly features. The platform provides a robust framework for online shopping. The website is designed to adapt to evolving business needs and can be efficiently extended.
