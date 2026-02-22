@@ -49,4 +49,25 @@ describe("CategoryForm Component", () => {
     
     expect(input).toHaveValue("Clothing");
   });
+
+  it("renders with empty initial value if not provided", () => {
+    render(<CategoryForm handleSubmit={handleSubmitMock} value="" setValue={setValueMock} />);
+    const input = screen.getByPlaceholderText("Enter new category");
+    expect(input).toHaveValue("");
+  });
+
+  it("has correct placeholder text", () => {
+    render(<CategoryForm handleSubmit={handleSubmitMock} value="" setValue={setValueMock} />);
+    expect(screen.getByPlaceholderText("Enter new category")).toBeInTheDocument();
+  });
+
+  it("button has correct Submit text", () => {
+    render(<CategoryForm handleSubmit={handleSubmitMock} value="" setValue={setValueMock} />);
+    expect(screen.getByRole("button")).toHaveTextContent("Submit");
+  });
+
+  it("does not call handleSubmit if button is not clicked", () => {
+    render(<CategoryForm handleSubmit={handleSubmitMock} value="Books" setValue={setValueMock} />);
+    expect(handleSubmitMock).not.toHaveBeenCalled();
+  });
 });

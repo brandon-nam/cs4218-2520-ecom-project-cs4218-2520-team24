@@ -45,4 +45,23 @@ describe("Database Connection", () => {
     expect(mongoose.connect).toHaveBeenCalledWith("mongodb://localhost:27017/testdb");
     expect(consoleLogSpy).toHaveBeenCalledWith(`Error in Mongodb Error: Connection failed`.bgRed.white);
   });
+
+  it("should use process.env.MONGO_URL for connection", async () => {
+    process.env.MONGO_URL = "mongodb://custom-url:27017/customdb";
+    mongoose.connect.mockResolvedValueOnce({ connection: { host: "custom-host" } });
+
+    await connectDB();
+
+    expect(mongoose.connect).toHaveBeenCalledWith("mongodb://custom-url:27017/customdb");
+    expect(consoleLogSpy).toHaveBeenCalledWith(`Connected To Mongodb Database custom-host`.bgMagenta.white);
+  });
+
+  it("should handle missing MONGO_URL gracefully", async () => {
+    delete process.env.MONGO_URL;
+    mongoose.connect.mockResolvedValueOnce({ connection: { host: "localhost" } });
+
+    await connectDB();
+
+    expect(mongoose.connect).toHaveBeenCalledWith(undefined);
+  });
 });

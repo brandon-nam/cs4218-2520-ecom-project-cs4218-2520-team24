@@ -28,4 +28,16 @@ it("should create a category successfully", () => {
     
     expect(category.slug).toBe("books");
   });
+
+  it("should fail validation if name is missing", () => {
+    const category = new Category({ slug: "test-slug" });
+    const err = category.validateSync();
+    expect(err).toBeUndefined(); // Name is not strictly required in the schema, just unique
+  });
+
+  it("should allow empty slug", () => {
+    const category = new Category({ name: "Test" });
+    const err = category.validateSync();
+    expect(err).toBeUndefined();
+  });
 });

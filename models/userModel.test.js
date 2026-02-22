@@ -34,4 +34,55 @@ it("should create a user successfully", () => {
     expect(err.errors.address).toBeDefined();
     expect(err.errors.answer).toBeDefined();
   });
+
+  it("should fail validation if only email is missing", () => {
+    const user = new User({
+      name: "John Doe",
+      password: "password123",
+      phone: "1234567890",
+      address: "123 Main St",
+      answer: "Blue",
+    });
+    const err = user.validateSync();
+    expect(err.errors.email).toBeDefined();
+    expect(err.errors.name).toBeUndefined();
+  });
+
+  it("should fail validation if only password is missing", () => {
+    const user = new User({
+      name: "John Doe",
+      email: "john@example.com",
+      phone: "1234567890",
+      address: "123 Main St",
+      answer: "Blue",
+    });
+    const err = user.validateSync();
+    expect(err.errors.password).toBeDefined();
+    expect(err.errors.email).toBeUndefined();
+  });
+
+  it("should set role to 0 by default", () => {
+    const user = new User({
+      name: "John Doe",
+      email: "john@example.com",
+      password: "password123",
+      phone: "1234567890",
+      address: "123 Main St",
+      answer: "Blue",
+    });
+    expect(user.role).toBe(0);
+  });
+
+  it("should allow role to be set to 1 (admin)", () => {
+    const user = new User({
+      name: "Admin User",
+      email: "admin@example.com",
+      password: "password123",
+      phone: "1234567890",
+      address: "123 Main St",
+      answer: "Blue",
+      role: 1,
+    });
+    expect(user.role).toBe(1);
+  });
 });

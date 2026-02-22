@@ -29,4 +29,28 @@ it("should create an order with default status", () => {
     expect(err.errors.status).toBeDefined();
     expect(err.errors.status.message).toContain("is not a valid enum value");
   });
+
+  it("should allow valid status values", () => {
+    const validStatuses = ["Not Process", "Processing", "Shipped", "deliverd", "cancel"];
+    
+    validStatuses.forEach(status => {
+      const order = new Order({ status });
+      const err = order.validateSync();
+      expect(err).toBeUndefined();
+    });
+  });
+
+  it("should allow empty products array", () => {
+    const order = new Order({ products: [] });
+    const err = order.validateSync();
+    expect(err).toBeUndefined();
+    expect(order.products).toEqual([]);
+  });
+
+  it("should allow empty payment object", () => {
+    const order = new Order({ payment: {} });
+    const err = order.validateSync();
+    expect(err).toBeUndefined();
+    expect(order.payment).toEqual({});
+  });
 });

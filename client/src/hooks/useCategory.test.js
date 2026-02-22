@@ -64,4 +64,24 @@ describe("useCategory Hook", () => {
     expect(axios.get).toHaveBeenCalledWith("/api/v1/category/get-category");
     expect(axios.get).toHaveBeenCalledTimes(1);
   });
+
+  it("should only call axios once on mount", async () => {
+    axios.get.mockResolvedValueOnce({
+      data: { success: true, category: [] },
+    });
+
+    renderHook(() => useCategory());
+
+    await waitFor(() => {
+      expect(axios.get).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it("should return empty array initially before API resolves", () => {
+    axios.get.mockImplementation(() => new Promise(() => {})); // Unresolved promise
+
+    const { result } = renderHook(() => useCategory());
+
+    expect(result.current).toEqual([]);
+  });
 });
