@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1771730175507" clover="3.2.0">
-  <project timestamp="1771730175508" name="All files">
-    <metrics statements="286" coveredstatements="284" conditionals="82" coveredconditionals="82" methods="33" coveredmethods="33" elements="401" coveredelements="399" complexity="0" loc="286" ncloc="286" packages="4" files="9" classes="9"/>
+<coverage generated="1771730771631" clover="3.2.0">
+  <project timestamp="1771730771631" name="All files">
+    <metrics statements="291" coveredstatements="291" conditionals="82" coveredconditionals="82" methods="34" coveredmethods="34" elements="407" coveredelements="407" complexity="0" loc="291" ncloc="291" packages="5" files="10" classes="10"/>
+    <package name="config">
+      <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+      <file name="db.js" path="/Users/nicholasleong/Desktop/cs4218-2520-ecom-project-cs4218-2520-team24/config/db.js">
+        <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="2" type="stmt"/>
+        <line num="5" count="2" type="stmt"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="8" count="1" type="stmt"/>
+      </file>
+    </package>
     <package name="controllers">
-      <metrics statements="260" coveredstatements="258" conditionals="80" coveredconditionals="80" methods="29" coveredmethods="29"/>
+      <metrics statements="260" coveredstatements="260" conditionals="80" coveredconditionals="80" methods="29" coveredmethods="29"/>
       <file name="authController.js" path="/Users/nicholasleong/Desktop/cs4218-2520-ecom-project-cs4218-2520-team24/controllers/authController.js">
-        <metrics statements="91" coveredstatements="89" conditionals="44" coveredconditionals="44" methods="8" coveredmethods="8"/>
+        <metrics statements="91" coveredstatements="91" conditionals="44" coveredconditionals="44" methods="8" coveredmethods="8"/>
         <line num="7" count="1" type="stmt"/>
         <line num="8" count="10" type="stmt"/>
         <line num="9" count="10" type="stmt"/>
@@ -62,10 +73,10 @@
         <line num="148" count="1" type="stmt"/>
         <line num="149" count="1" type="stmt"/>
         <line num="158" count="1" type="stmt"/>
-        <line num="159" count="1" type="stmt"/>
-        <line num="160" count="1" type="stmt"/>
-        <line num="162" count="0" type="stmt"/>
-        <line num="163" count="0" type="stmt"/>
+        <line num="159" count="2" type="stmt"/>
+        <line num="160" count="2" type="stmt"/>
+        <line num="162" count="1" type="stmt"/>
+        <line num="163" count="1" type="stmt"/>
         <line num="168" count="1" type="stmt"/>
         <line num="169" count="35" type="stmt"/>
         <line num="170" count="35" type="stmt"/>

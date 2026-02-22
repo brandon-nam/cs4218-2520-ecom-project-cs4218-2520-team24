@@ -580,6 +580,20 @@ describe("Test Controller", () => {
 
         expect(res.send).toHaveBeenCalledWith("Protected Routes");
     });
+
+    it("handles errors and returns error object", () => {
+        const req = {};
+        const res = createResponse();
+        const error = new Error("Test error");
+        
+        res.send.mockImplementationOnce(() => {
+            throw error;
+        });
+
+        testController(req, res);
+
+        expect(res.send).toHaveBeenCalledWith({ error });
+    });
 });
 
 describe("Get Orders Controller", () => {
