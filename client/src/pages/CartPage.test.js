@@ -1,3 +1,4 @@
+// Nam Dohyun, A0226590A
 import React, { useEffect } from 'react'; // Added useEffect for the mock
 import { render, fireEvent, waitFor, act, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';

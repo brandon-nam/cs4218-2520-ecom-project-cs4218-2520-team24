@@ -1,3 +1,4 @@
+// Nam Dohyun, A0226590A
 import {
     createProductController,
     getProductController,
@@ -595,21 +596,36 @@ describe('productFiltersController', () => {
     });
 
     it('should handle errors in the catch block', async () => {
-        const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => { });
+        // 1. Spy on error, not log (matching your controller's catch block)
+        const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
+        
+        // 2. Mock the first async call so it doesn't fail early
+        productModel.countDocuments = jest.fn().mockResolvedValue(10);
+
+        // 3. Mock find to throw the error
         productModel.find = jest.fn().mockImplementation(() => {
             throw new Error("Filter Error");
         });
 
+        const req = { body: { checked: [], radio: [] } };
+        const res = { status: jest.fn().mockReturnThis(), send: jest.fn() };
+
         await productFiltersController(req, res);
 
+        // Assertions
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith(
-            expect.objectContaining({ success: false, message: "Error While Filtering Products" })
+            expect.objectContaining({ 
+                success: false, 
+                message: "Error While Filtering Products" 
+            })
         );
+        
+        // This will now pass and keep the console clean
         expect(consoleSpy).toHaveBeenCalled();
 
         consoleSpy.mockRestore();
-    })
+    });
 });
 
 describe('productCountController', () => {
@@ -862,6 +878,7 @@ describe('productCategoryController', () => {
     });
 
     it('should handle errors in productCategoryController', async () => {
+        const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => { });
         const req = { params: { slug: 'electronics' } };
         const res = { status: jest.fn().mockReturnThis(), send: jest.fn() };
         categoryModel.findOne = jest.fn().mockRejectedValue(new Error("Cat Error"));
@@ -869,6 +886,8 @@ describe('productCategoryController', () => {
         await productCategoryController(req, res);
 
         expect(res.status).toHaveBeenCalledWith(400);
+        expect(consoleSpy).toHaveBeenCalled();
+        consoleSpy.mockRestore();
     });
 });
 
@@ -919,6 +938,7 @@ describe('brainTreePaymentController Errors', () => {
     });
 
     it('should return 500 and trigger catch block when gateway crashes/rejects', async () => {
+        const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => { });
         const errorResponse = new Error("Gateway Timeout");
 
         // Mock a Promise rejection (this triggers the 'catch' block)
@@ -933,6 +953,8 @@ describe('brainTreePaymentController Errors', () => {
             message: "Error in BrainTree Payment",
             error: errorResponse
         }));
+        expect(consoleSpy).toHaveBeenCalled();
+        consoleSpy.mockRestore();
     });
 });
 
@@ -954,13 +976,32 @@ describe('productListController Edge Cases', () => {
 });
 
 describe('productFiltersController Empty Filters', () => {
-    it('should work with empty filters', async () => {
-        const req = { body: { checked: [], radio: [] } };
+    it('should work with empty filters', async () => { 
+        const req = { body: { checked: [], radio: [], page: 1 } };
         const res = { status: jest.fn().mockReturnThis(), send: jest.fn() };
-        productModel.find = jest.fn().mockResolvedValue([]);
+
+        // 1. Mock countDocuments
+        productModel.countDocuments = jest.fn().mockResolvedValue(0);
+
+        // 2. Mock the chain properly
+        // Every method before the final 'await' must return 'this' (the mock object)
+        const mockQuery = {
+            skip: jest.fn().mockReturnThis(),
+            limit: jest.fn().mockReturnThis(),
+            sort: jest.fn().mockResolvedValue([]) // The last one returns the actual data
+        };
+
+        // Ensure find returns that mockQuery object
+        productModel.find = jest.fn().mockReturnValue(mockQuery);
 
         await productFiltersController(req, res);
 
-        expect(productModel.find).toHaveBeenCalledWith({});
+        // Assertions
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.send).toHaveBeenCalledWith(expect.objectContaining({
+            success: true,
+            products: [],
+            total: 0
+        }));
     });
 });

@@ -195,6 +195,7 @@ describe("Register Controller", () => {
     });
     
     it("should handle errors", async () => {
+        const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
         const req = { body: {
             name: "name",
             email: "email",
@@ -214,6 +215,8 @@ describe("Register Controller", () => {
             message: "Error in registration",
             error: expect.any(Error),
         });
+        expect(consoleSpy).toHaveBeenCalledWith(new Error("db error"));
+        consoleSpy.mockRestore();
     });
 });
 
@@ -298,6 +301,7 @@ describe("Update Profile Controller", () => {
     });
 
     it("handles errors", async () => {
+        const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
         userModel.findById.mockRejectedValue(new Error("db error"));
 
         const req = { body: { password: "123456" }, user: { _id: "u1" } };
@@ -307,11 +311,13 @@ describe("Update Profile Controller", () => {
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.send).toHaveBeenCalledWith({
-        success: false,
-        message: "Error while updating profile",
-        error: expect.any(Error),
+            success: false,
+            message: "Error while updating profile",
+            error: expect.any(Error),
+        });
+        expect(consoleSpy).toHaveBeenCalledWith(new Error("db error"));
+        consoleSpy.mockRestore();
     });
-  });
 });
 
 describe("Login Controller", () => {
@@ -422,6 +428,7 @@ describe("Login Controller", () => {
     });
 
     it("handles userModel errors", async () => {
+        const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
         const req = {
             body: { email: "test@example.com", password: "password" }
         };
@@ -436,9 +443,12 @@ describe("Login Controller", () => {
             message: "Error while logging in",
             error: expect.any(Error),
         });
+        expect(consoleSpy).toHaveBeenCalledWith(new Error("db error"));
+        consoleSpy.mockRestore();
     });
 
     it("handles JWT errors", async () => {
+        const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
         const req = {
             body: { email: "test@example.com", password: "password" }
         };
@@ -464,6 +474,8 @@ describe("Login Controller", () => {
             message: "Error while logging in",
             error: expect.any(Error),
         });
+        expect(consoleSpy).toHaveBeenCalledWith(new Error("jwt error"));
+        consoleSpy.mockRestore();
     });
 });
 
@@ -549,6 +561,7 @@ describe("Forgot Password Controller", () => {
     });
 
     it("handles errors", async () => {
+        const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
         const req = {
             body: { email: "test@example.com", answer: "answer", newPassword: "new_password" }
         };
@@ -564,6 +577,8 @@ describe("Forgot Password Controller", () => {
             message: "Something went wrong",
             error: expect.any(Error),
         });
+        expect(consoleSpy).toHaveBeenCalledWith(new Error("db error"));
+        consoleSpy.mockRestore();
     });
 });
 
@@ -582,6 +597,7 @@ describe("Test Controller", () => {
     });
 
     it("handles errors and returns error object", () => {
+        const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
         const req = {};
         const res = createResponse();
         const error = new Error("Test error");
@@ -593,6 +609,8 @@ describe("Test Controller", () => {
         testController(req, res);
 
         expect(res.send).toHaveBeenCalledWith({ error });
+        expect(consoleSpy).toHaveBeenCalledWith(error);
+        consoleSpy.mockRestore();
     });
 });
 
@@ -619,6 +637,7 @@ describe("Get Orders Controller", () => {
     });
 
     it("handles errors", async () => {
+        const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
         const req = { user: { _id: "userId" } };
         const res = createResponse();
 
@@ -634,6 +653,8 @@ describe("Get Orders Controller", () => {
             message: "Error while getting orders",
             error: expect.any(Error),
         });
+        expect(consoleSpy).toHaveBeenCalledWith(new Error("db error"));
+        consoleSpy.mockRestore();
     });
 });
 
@@ -662,6 +683,7 @@ describe("Get All Orders Controller", () => {
     });
 
     it("handles errors", async () => {
+        const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
         const req = {};
         const res = createResponse();
 
@@ -677,6 +699,8 @@ describe("Get All Orders Controller", () => {
             message: "Error while getting orders",
             error: expect.any(Error),
         });
+        expect(consoleSpy).toHaveBeenCalledWith(new Error("db error"));
+        consoleSpy.mockRestore();
     });
 });
 
@@ -703,6 +727,7 @@ describe("Order Status Controller", () => {
     });
 
     it("handles errors", async () => {
+        const consoleSpy = jest.spyOn(console, "log").mockImplementation(() => {});
         const req = { params: { orderId: "orderId" }, body: { status: "Delivered" } };
         const res = createResponse();
 
@@ -716,6 +741,8 @@ describe("Order Status Controller", () => {
             message: "Error while updating order status",
             error: expect.any(Error),
         });
+        expect(consoleSpy).toHaveBeenCalledWith(new Error("db error"));
+        consoleSpy.mockRestore();
     });
 });
 

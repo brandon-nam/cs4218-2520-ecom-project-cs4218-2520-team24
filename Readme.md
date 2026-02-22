@@ -1,5 +1,11 @@
 # CS4218 Project - Virtual Vault
 
+## Individual Contribution
+Nam Dohyun, A0226590A
+- Wrote unit tests for productController.js 
+- Wrote unit tests for pages/ UI files
+
+
 ## 1. Project Introduction
 
 Virtual Vault is a full-stack MERN (MongoDB, Express.js, React.js, Node.js) e-commerce website, offering seamless connectivity and user-friendly features. The platform provides a robust framework for online shopping. The website is designed to adapt to evolving business needs and can be efficiently extended.
