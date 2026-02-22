@@ -21,12 +21,16 @@ export default {
 
   // run frontend unit tests
   testMatch: ["<rootDir>/client/src/**/*.test.js"],
+  testPathIgnorePatterns: ["<rootDir>/client/src/_site/"],
 
   // jest code coverage
   collectCoverage: true,
+  coverageDirectory: "coverage/frontend",
   collectCoverageFrom: [
-    "client/src/pages/Auth/**",
+    "client/src/pages/**",
+    "client/src/components/**",
     "client/src/context/**",
+    "client/src/hooks/**"
   ],
   coverageThreshold: {
     global: {
