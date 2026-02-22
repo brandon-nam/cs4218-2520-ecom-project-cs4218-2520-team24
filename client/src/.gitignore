@@ -21,5 +21,3 @@ _site/
 .vscode/
 .idea/*
 *.iml
-
-sonar-project.properties
