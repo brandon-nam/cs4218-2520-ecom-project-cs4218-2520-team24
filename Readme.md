@@ -13,6 +13,9 @@ Leong Yu Jun Nicholas, A0257284W
 - Wrote unit tests for model files
 - Wrote unit tests for useCategory.js hook and db.js config file
 
+## MSI CI URL
+[Link to Milestone 1 CI](https://github.com/cs4218/cs4218-2520-ecom-project-cs4218-2520-team24/actions/runs/22278931150/job/64445985837)
+
 ## 1. Project Introduction
 
 Virtual Vault is a full-stack MERN (MongoDB, Express.js, React.js, Node.js) e-commerce website, offering seamless connectivity and user-friendly features. The platform provides a robust framework for online shopping. The website is designed to adapt to evolving business needs and can be efficiently extended.
