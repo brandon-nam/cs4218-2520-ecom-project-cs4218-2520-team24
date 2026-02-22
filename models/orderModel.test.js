@@ -3,15 +3,8 @@ import mongoose from "mongoose";
 import Order from "./orderModel";
 
 describe("Order Model Test", () => {
-  beforeEach(() => {
-    // Setup if needed
-  });
 
-  afterEach(() => {
-    // Teardown if needed
-  });
-
-  it("should create an order with default status", () => {
+it("should create an order with default status", () => {
     const orderData = {
       products: [new mongoose.Types.ObjectId()],
       payment: { success: true },

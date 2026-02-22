@@ -19,15 +19,11 @@ describe("Spinner Component", () => {
     jest.useFakeTimers();
     mockNavigate = jest.fn();
     mockLocation = { pathname: "/current-path" };
-    
     useNavigate.mockReturnValue(mockNavigate);
     useLocation.mockReturnValue(mockLocation);
   });
 
   afterEach(() => {
-    act(() => {
-      jest.runOnlyPendingTimers();
-    });
     jest.useRealTimers();
     jest.clearAllMocks();
   });

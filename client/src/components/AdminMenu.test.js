@@ -6,15 +6,8 @@ import "@testing-library/jest-dom/extend-expect";
 import AdminMenu from "./AdminMenu";
 
 describe("AdminMenu Component", () => {
-  beforeEach(() => {
-    // Setup if needed
-  });
 
-  afterEach(() => {
-    // Teardown if needed
-  });
-
-  it("renders the Admin Panel header", () => {
+it("renders the Admin Panel header", () => {
     render(
       <MemoryRouter>
         <AdminMenu />

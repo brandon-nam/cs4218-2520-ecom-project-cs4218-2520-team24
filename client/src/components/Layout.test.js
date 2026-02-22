@@ -12,15 +12,8 @@ jest.mock("react-hot-toast", () => ({
 }));
 
 describe("Layout Component", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
 
-  afterEach(() => {
-    // Clean up any side effects if necessary
-  });
-
-  it("renders Header, Footer, Toaster, and children", () => {
+it("renders Header, Footer, Toaster, and children", () => {
     const childContent = <div data-testid="child-content">Child Content</div>;
 
     render(<Layout>{childContent}</Layout>);

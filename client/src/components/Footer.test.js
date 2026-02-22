@@ -5,15 +5,8 @@ import { MemoryRouter } from "react-router-dom";
 import Footer from "./Footer";
 
 describe("Footer Component", () => {
-  beforeEach(() => {
-    // Setup if needed
-  });
 
-  afterEach(() => {
-    // Teardown if needed
-  });
-
-  it("renders the footer text correctly", () => {
+it("renders the footer text correctly", () => {
     render(
       <MemoryRouter>
         <Footer />

@@ -2,15 +2,8 @@
 import { Prices } from "./Prices";
 
 describe("Prices Array", () => {
-  beforeEach(() => {
-    // Setup if needed
-  });
 
-  afterEach(() => {
-    // Teardown if needed
-  });
-
-  it("should be an array of price range objects", () => {
+it("should be an array of price range objects", () => {
     const isArray = Array.isArray(Prices);
     const length = Prices.length;
 

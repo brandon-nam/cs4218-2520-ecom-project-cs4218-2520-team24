@@ -6,15 +6,8 @@ import "@testing-library/jest-dom/extend-expect";
 import UserMenu from "./UserMenu";
 
 describe("UserMenu Component", () => {
-  beforeEach(() => {
-    // Setup if needed
-  });
 
-  afterEach(() => {
-    // Teardown if needed
-  });
-
-  it("renders the Dashboard header", () => {
+it("renders the Dashboard header", () => {
     render(
       <MemoryRouter>
         <UserMenu />

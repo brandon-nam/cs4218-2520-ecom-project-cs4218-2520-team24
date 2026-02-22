@@ -3,15 +3,8 @@ import mongoose from "mongoose";
 import User from "./userModel";
 
 describe("User Model Test", () => {
-  beforeEach(() => {
-    // Setup if needed
-  });
 
-  afterEach(() => {
-    // Teardown if needed
-  });
-
-  it("should create a user successfully", () => {
+it("should create a user successfully", () => {
     const userData = {
       name: "John Doe",
       email: "john@example.com",

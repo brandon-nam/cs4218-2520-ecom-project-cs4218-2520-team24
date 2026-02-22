@@ -3,15 +3,8 @@ import mongoose from "mongoose";
 import Product from "./productModel";
 
 describe("Product Model Test", () => {
-  beforeEach(() => {
-    // Setup if needed
-  });
 
-  afterEach(() => {
-    // Teardown if needed
-  });
-
-  it("should create a product successfully", () => {
+it("should create a product successfully", () => {
     const productData = {
       name: "Test Product",
       slug: "test-product",

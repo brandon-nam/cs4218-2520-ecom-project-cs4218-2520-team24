@@ -3,15 +3,8 @@ import mongoose from "mongoose";
 import Category from "./categoryModel";
 
 describe("Category Model Test", () => {
-  beforeEach(() => {
-    // Setup if needed
-  });
 
-  afterEach(() => {
-    // Teardown if needed
-  });
-
-  it("should create a category successfully", () => {
+it("should create a category successfully", () => {
     const categoryData = {
       name: "Electronics",
       slug: "electronics",
