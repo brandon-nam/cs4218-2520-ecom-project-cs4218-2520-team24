@@ -240,4 +240,26 @@ describe('CreateProduct Page', () => {
         
         expect(select.value).toBe('1');
     });
+
+    it('sets category state on change', async () => {
+        // 1. Mock the initial category fetch
+        axios.get.mockResolvedValue({ 
+            data: { success: true, category: mockCategories } 
+        });
+
+        const { getByLabelText } = render(
+            <MemoryRouter>
+                <CreateProduct />
+            </MemoryRouter>
+        );
+
+        // 2. Wait for categories to load and find the Select by its placeholder (mocked as aria-label)
+        const categorySelect = await waitFor(() => getByLabelText('Select a category'));
+        
+        // 3. Simulate selecting the 'Electronics' category (ID: '1')
+        fireEvent.change(categorySelect, { target: { value: '1' } });
+        
+        // 4. Assert the value has changed
+        expect(categorySelect.value).toBe('1');
+    });
 });
