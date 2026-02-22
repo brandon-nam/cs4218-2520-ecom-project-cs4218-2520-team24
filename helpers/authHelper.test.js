@@ -1,3 +1,4 @@
+// Choo Jia Rong, A0257352A
 import bcrypt from "bcrypt";
 import { comparePassword, hashPassword } from "./authHelper.js";
 
