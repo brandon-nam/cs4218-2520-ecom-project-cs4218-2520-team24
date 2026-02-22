@@ -1,50 +1,56 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
-import "@testing-library/jest-dom/extend-expect";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { SearchProvider, useSearch } from "./search";
 
-// A test component to consume the context
-const TestComponent = () => {
+const SearchConsumer = () => {
   const [search, setSearch] = useSearch();
 
   return (
-    <div>
-      <div data-testid="keyword">{search.keyword}</div>
-      <div data-testid="results-length">{search.results.length}</div>
+    <>
+      <span data-testid="keyword">{search.keyword || "empty"}</span>
+      <span data-testid="results-count">{search.results.length}</span>
       <button
         onClick={() =>
-          setSearch({ keyword: "test keyword", results: [{ id: 1, name: "Test Product" }] })
+          setSearch({
+            keyword: "laptop",
+            results: [{ _id: "product-1" }],
+          })
         }
       >
-        Update Search
+        update
       </button>
-    </div>
+    </>
   );
 };
 
-describe("Search Context", () => {
-  it("provides default values", () => {
-    render(
-      <SearchProvider>
-        <TestComponent />
-      </SearchProvider>
-    );
-
-    expect(screen.getByTestId("keyword")).toHaveTextContent("");
-    expect(screen.getByTestId("results-length")).toHaveTextContent("0");
+describe("Search context", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
-  it("updates values correctly", () => {
+  it("uses default search state", () => {
     render(
       <SearchProvider>
-        <TestComponent />
+        <SearchConsumer />
       </SearchProvider>
     );
 
-    const button = screen.getByRole("button", { name: /update search/i });
-    fireEvent.click(button);
+    expect(screen.getByTestId("keyword")).toHaveTextContent("empty");
+    expect(screen.getByTestId("results-count")).toHaveTextContent("0");
+  });
 
-    expect(screen.getByTestId("keyword")).toHaveTextContent("test keyword");
-    expect(screen.getByTestId("results-length")).toHaveTextContent("1");
+  it("updates search state via setSearch", async () => {
+    render(
+      <SearchProvider>
+        <SearchConsumer />
+      </SearchProvider>
+    );
+
+    fireEvent.click(screen.getByText("update"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("keyword")).toHaveTextContent("laptop");
+      expect(screen.getByTestId("results-count")).toHaveTextContent("1");
+    });
   });
 });

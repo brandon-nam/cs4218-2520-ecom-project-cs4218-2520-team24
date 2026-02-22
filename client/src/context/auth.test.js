@@ -1,9 +1,8 @@
 import React from "react";
-import { render, screen, act } from "@testing-library/react";
-import { AuthProvider, useAuth } from "./auth";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import axios from "axios";
+import { AuthProvider, useAuth } from "./auth";
 
-// Mock axios
 jest.mock("axios", () => ({
   defaults: {
     headers: {
@@ -12,77 +11,74 @@ jest.mock("axios", () => ({
   },
 }));
 
-// A test component to consume the context
-const TestComponent = () => {
+const AuthConsumer = () => {
   const [auth, setAuth] = useAuth();
 
   return (
-    <div>
-      <div data-testid="auth-user">{auth.user ? auth.user.name : "null"}</div>
-      <div data-testid="auth-token">{auth.token || "empty"}</div>
-      <button
-        data-testid="login-btn"
-        onClick={() => setAuth({ user: { name: "Test User" }, token: "test-token" })}
-      >
-        Login
+    <>
+      <span data-testid="token">{auth.token || "empty"}</span>
+      <span data-testid="user">{auth.user?.name || "none"}</span>
+      <button onClick={() => setAuth({ user: { name: "Updated" }, token: "updated-token" })}>
+        update
       </button>
-    </div>
+    </>
   );
 };
 
-describe("Auth Context", () => {
+describe("Auth context", () => {
   beforeEach(() => {
-    // Clear localStorage and axios headers before each test
     localStorage.clear();
-    axios.defaults.headers.common["Authorization"] = undefined;
+    axios.defaults.headers.common = {};
     jest.clearAllMocks();
   });
 
-  it("provides default auth state", () => {
+  it("uses default auth state when localStorage is empty", async () => {
     render(
       <AuthProvider>
-        <TestComponent />
+        <AuthConsumer />
       </AuthProvider>
     );
 
-    expect(screen.getByTestId("auth-user")).toHaveTextContent("null");
-    expect(screen.getByTestId("auth-token")).toHaveTextContent("empty");
-  });
+    expect(screen.getByTestId("token")).toHaveTextContent("empty");
+    expect(screen.getByTestId("user")).toHaveTextContent("none");
 
-  it("loads auth data from localStorage on mount", () => {
-    const mockAuthData = {
-      user: { name: "Saved User" },
-      token: "saved-token",
-    };
-    localStorage.setItem("auth", JSON.stringify(mockAuthData));
-
-    render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>
-    );
-
-    expect(screen.getByTestId("auth-user")).toHaveTextContent("Saved User");
-    expect(screen.getByTestId("auth-token")).toHaveTextContent("saved-token");
-  });
-
-  it("updates auth state and axios headers", () => {
-    render(
-      <AuthProvider>
-        <TestComponent />
-      </AuthProvider>
-    );
-
-    expect(screen.getByTestId("auth-user")).toHaveTextContent("null");
-
-    act(() => {
-      screen.getByTestId("login-btn").click();
+    await waitFor(() => {
+      expect(axios.defaults.headers.common.Authorization).toBe("");
     });
+  });
 
-    expect(screen.getByTestId("auth-user")).toHaveTextContent("Test User");
-    expect(screen.getByTestId("auth-token")).toHaveTextContent("test-token");
-    
-    // Check if axios default header is updated
-    expect(axios.defaults.headers.common["Authorization"]).toBe("test-token");
+  it("hydrates auth state from localStorage", async () => {
+    localStorage.setItem(
+      "auth",
+      JSON.stringify({ user: { name: "Jane" }, token: "stored-token" })
+    );
+
+    render(
+      <AuthProvider>
+        <AuthConsumer />
+      </AuthProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toHaveTextContent("stored-token");
+      expect(screen.getByTestId("user")).toHaveTextContent("Jane");
+      expect(axios.defaults.headers.common.Authorization).toBe("stored-token");
+    });
+  });
+
+  it("updates auth state via setAuth", async () => {
+    render(
+      <AuthProvider>
+        <AuthConsumer />
+      </AuthProvider>
+    );
+
+    fireEvent.click(screen.getByText("update"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toHaveTextContent("updated-token");
+      expect(screen.getByTestId("user")).toHaveTextContent("Updated");
+      expect(axios.defaults.headers.common.Authorization).toBe("updated-token");
+    });
   });
 });

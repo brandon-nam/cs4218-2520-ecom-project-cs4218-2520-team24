@@ -1,67 +1,59 @@
 import React from "react";
-import { render, screen, act } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { CartProvider, useCart } from "./cart";
 
-// A test component to consume the context
-const TestComponent = () => {
+const CartConsumer = () => {
   const [cart, setCart] = useCart();
 
   return (
-    <div>
-      <div data-testid="cart-length">{cart.length}</div>
-      <button
-        data-testid="add-item"
-        onClick={() => setCart([...cart, { id: 1, name: "Test Product" }])}
-      >
-        Add Item
-      </button>
-    </div>
+    <>
+      <span data-testid="count">{cart.length}</span>
+      <button onClick={() => setCart([...cart, { _id: "new-item" }])}>add</button>
+    </>
   );
 };
 
-describe("Cart Context", () => {
+describe("Cart context", () => {
   beforeEach(() => {
-    // Clear localStorage before each test
     localStorage.clear();
     jest.clearAllMocks();
   });
 
-  it("provides an empty cart by default", () => {
+  it("uses empty cart by default", () => {
     render(
       <CartProvider>
-        <TestComponent />
+        <CartConsumer />
       </CartProvider>
     );
 
-    expect(screen.getByTestId("cart-length")).toHaveTextContent("0");
+    expect(screen.getByTestId("count")).toHaveTextContent("0");
   });
 
-  it("loads cart from localStorage on mount", () => {
-    const mockCart = [{ id: 1, name: "Saved Product" }, { id: 2, name: "Another Product" }];
-    localStorage.setItem("cart", JSON.stringify(mockCart));
+  it("hydrates cart from localStorage", async () => {
+    localStorage.setItem("cart", JSON.stringify([{ _id: "item-1" }, { _id: "item-2" }]));
 
     render(
       <CartProvider>
-        <TestComponent />
+        <CartConsumer />
       </CartProvider>
     );
 
-    expect(screen.getByTestId("cart-length")).toHaveTextContent("2");
-  });
-
-  it("allows updating the cart", () => {
-    render(
-      <CartProvider>
-        <TestComponent />
-      </CartProvider>
-    );
-
-    expect(screen.getByTestId("cart-length")).toHaveTextContent("0");
-
-    act(() => {
-      screen.getByTestId("add-item").click();
+    await waitFor(() => {
+      expect(screen.getByTestId("count")).toHaveTextContent("2");
     });
+  });
 
-    expect(screen.getByTestId("cart-length")).toHaveTextContent("1");
+  it("updates cart state via setCart", async () => {
+    render(
+      <CartProvider>
+        <CartConsumer />
+      </CartProvider>
+    );
+
+    fireEvent.click(screen.getByText("add"));
+
+    await waitFor(() => {
+      expect(screen.getByTestId("count")).toHaveTextContent("1");
+    });
   });
 });
