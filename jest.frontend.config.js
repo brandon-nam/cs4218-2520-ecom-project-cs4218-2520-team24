@@ -26,7 +26,7 @@ export default {
   collectCoverage: true,
   coverageDirectory: "coverage/frontend",
   collectCoverageFrom: [
-    "client/src/pages/Auth/**",
+    "client/src/pages/**",
     "client/src/components/**",
     "client/src/context/**",
     "client/src/hooks/**"
