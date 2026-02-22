@@ -202,18 +202,15 @@ export const updateProductController = async (req, res) => {
 export const productFiltersController = async (req, res) => {
   try {
     const { checked, radio } = req.body;
-    // Get page from query or body; default to 1
-    const page = req.body.page ? req.body.page : 1;
-    const perPage = 6; // Match this with your productListController limit
+    const page = req.body.page || 1;
+    const perPage = 6;
 
     let args = {};
-    if (checked.length > 0) args.category = checked;
-    if (radio.length) args.price = { $gte: radio[0], $lte: radio[1] };
+    if (checked && checked.length > 0) args.category = checked;
+    if (radio && radio.length === 2) args.price = { $gte: radio[0], $lte: radio[1] };
 
-    // 1. Get the total count of products matching THESE specific filters
-    const total = await productModel.find(args).countDocuments();
+    const total = await productModel.countDocuments(args);
 
-    // 2. Fetch the paginated products
     const products = await productModel
       .find(args)
       .skip((page - 1) * perPage)
@@ -223,14 +220,14 @@ export const productFiltersController = async (req, res) => {
     res.status(200).send({
       success: true,
       products,
-      total, // Return the filtered total so frontend knows when to hide "Load More"
+      total,
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(400).send({
       success: false,
       message: "Error While Filtering Products",
-      error,
+      error: error.message, // Sending just the message is cleaner for the client
     });
   }
 };
