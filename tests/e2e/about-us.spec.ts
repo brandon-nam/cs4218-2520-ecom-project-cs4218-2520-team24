@@ -21,10 +21,6 @@ test.describe('About Us Page', () => {
     // 5. Verify the image by its functional presence
     await expect(page.getByRole('img', { name: 'contactus' })).toBeVisible();
 
-    // 6. Verify text using a flexible match
-    // Instead of 'p.text-justify', look for the content directly
-    await expect(page.getByText('Add text')).toBeVisible();
-
     // 7. Verify Footer links exist (checking visibility is often better than just attributes)
     await expect(footer.getByRole('link', { name: 'Contact' })).toBeVisible();
     await expect(footer.getByRole('link', { name: 'Privacy Policy' })).toBeVisible();

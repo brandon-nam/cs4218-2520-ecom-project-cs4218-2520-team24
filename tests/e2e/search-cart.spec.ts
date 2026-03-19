@@ -11,14 +11,16 @@ test.describe('Search and Add to Cart E2E', () => {
     await expect(page).toHaveURL(/.*search.*/);
     await expect(page.getByRole('heading', { name: /search results/i })).toBeVisible();
       
-    const productItem = page.getByRole('listitem').filter({ hasText: /smartphone/i });
+    // Find the product item more robustly - some layouts use cards without listitems
+    const productItem = page.locator('.card').filter({ hasText: /smartphone/i }).first();
     await expect(productItem).toBeVisible();
     
     await productItem.getByRole('button', { name: /add to cart/i }).click();
     
-    const cartLink = page.getByRole('link', { name: /cart/i });
-    await expect(cartLink).toContainText('1');
+    const cartCount = page.locator('.ant-badge-count');
+    await expect(cartCount).toHaveText('1');
     
+    const cartLink = page.getByRole('link', { name: /cart/i });
     await cartLink.click();
     await expect(page).toHaveURL(/.*cart.*/);
     

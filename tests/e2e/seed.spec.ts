@@ -42,6 +42,23 @@ test.describe('Test group', () => {
       } else {
         console.log('Product already exists: Smartphone');
       }
+
+      // Create Tablet product if it doesn't exist (for similar products testing)
+      let tablet = await Product.findOne({ slug: 'tablet' });
+      if (!tablet) {
+        await new Product({
+          name: 'Tablet',
+          slug: 'tablet',
+          description: 'A great tablet for testing similar products',
+          price: 599,
+          category: category._id,
+          quantity: 15,
+          shipping: true
+        }).save();
+        console.log('Seeded Product: Tablet');
+      } else {
+        console.log('Product already exists: Tablet');
+      }
     } finally {
       // Always disconnect after seeding
       await mongoose.disconnect();

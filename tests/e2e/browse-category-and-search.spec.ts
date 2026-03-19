@@ -1,40 +1,47 @@
-// spec: specs/navigation-search-flow.plan.md
-// seed: seed.spec.ts
-
 import { test, expect } from '@playwright/test';
 
-test.describe('Home → Category → Product → Search', () => {
-  test('Browse category, open product, then search for another item', async ({ page }) => {
-    // Navigate to the Home page for the scenario.
-    await page.goto('http://localhost:3000/');
-    await expect(page).toHaveURL(/\/$/);
-    await expect(page.getByRole('heading', { name: 'All Products' })).toBeVisible();
+test.describe('E2E: Discovery Flow', () => {
+  test('should navigate from categories to a product and perform a search', async ({ page }) => {
+    // 1. Use relative path (best practice: set baseURL in playwright.config.ts)
+    await page.goto('/');
+    
+    // 2. Navigation: Using roles is more robust than relying on exact link structures
+    const nav = page.getByRole('navigation');
+    await nav.getByRole('link', { name: /categories/i }).click(); 
+    // Click "All Categories" inside the dropdown to actually navigate
+    await page.getByRole('link', { name: /all categories/i }).click();
 
-    // Open the Categories dropdown and navigate to All Categories.
-    await page.getByRole('link', { name: 'Categories' }).click();
-
-    // Click All Categories to navigate to /categories.
-    await page.getByRole('link', { name: 'All Categories' }).click();
+    // 3. Category Selection
     await expect(page).toHaveURL(/\/categories/);
-    await expect(page.getByRole('link', { name: 'Electronics' })).toBeVisible();
-
-    // Click a category (Electronics) to view its products.
-    await page.getByRole('link', { name: 'Electronics' }).click();
+    // Clicking 'Electronics' - using a regex /i makes it case-insensitive
+    await page.getByRole('link', { name: /electronics/i }).click();
+    
+    // 4. Verification: Check that we are on a category page
     await expect(page).toHaveURL(/\/category\//);
-    await expect(page.getByRole('heading', { name: /Category -/ })).toBeVisible();
+    // Use a more flexible heading check
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(/category/i);
 
-    // Click the first product's 'More Details' button to open the product detail page.
-    await page.getByRole('button', { name: 'More Details' }).first().click();
+    // 5. Product Interaction
+    // Instead of .first(), try to find a specific product or a container
+    const productCard = page.locator('.card, .product-item').first(); 
+    await productCard.getByRole('button', { name: /more details/i }).click();
+    
     await expect(page).toHaveURL(/\/product\//);
-    await expect(page.getByRole('heading', { name: 'Product Details' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /product details/i })).toBeVisible();
 
-    // Type a different product keyword into the global search bar.
-    await page.getByRole('searchbox', { name: 'Search' }).fill('Smartphone');
+    // 6. Global Search
+    // Use getByPlaceholder if 'Search' is the ghost text in the box
+    const searchInput = page.getByPlaceholder(/search/i);
+    await searchInput.fill('Smartphone');
+    await page.getByRole('button', { name: /search/i }).click();
 
-    // Submit the global search form to navigate to the search results page.
-    await page.getByRole('button', { name: 'Search' }).click();
-    await expect(page).toHaveURL(/\/search/);
-    await expect(page.getByRole('heading', { name: 'Search Resuts' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'More Details' })).toBeVisible();
+    // 7. Final Assertions
+    await expect(page).toHaveURL(/.*search.*/);
+    
+    // Using a regex to be resilient to typography/case changes
+    await expect(page.getByRole('heading', { name: /search results/i })).toBeVisible();
+    
+    // Ensure at least one product appeared in the results
+    await expect(page.getByRole('button', { name: /more details/i }).first()).toBeVisible();
   });
 });

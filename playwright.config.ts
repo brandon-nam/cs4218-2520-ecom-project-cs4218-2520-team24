@@ -1,4 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
+import { MongoMemoryServer } from 'mongodb-memory-server';
+
+// Start MongoMemoryServer at the top level to share URI with webServer
+const mongoServer = await MongoMemoryServer.create();
+const mongoUri = mongoServer.getUri();
+process.env.MONGO_URL = mongoUri;
+console.log(`Global MongoMemoryServer started at: ${mongoUri}`);
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -12,11 +19,11 @@ export default defineConfig({
   workers: 1, // Stay on 1 worker for DB consistency in E2E
   reporter: 'html',
   
+  // Custom seeding now happens in globalSetup using the shared MONGO_URL
   globalSetup: './tests/global-setup',
-  globalTeardown: './tests/global-teardown',
 
   use: {
-    baseURL: 'http://localhost:6060', // Port defined in server.js
+    baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
   },
 
@@ -30,7 +37,7 @@ export default defineConfig({
   webServer: {
     command: 'npm run dev',
     url: 'http://localhost:3000',
-    reuseExistingServer: true,
+    reuseExistingServer: false,
     timeout: 180 * 1000,
     env: {
        NODE_ENV: 'test',
