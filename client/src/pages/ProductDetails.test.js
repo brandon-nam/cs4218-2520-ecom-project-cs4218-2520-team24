@@ -294,4 +294,38 @@ describe('ProductDetails Page', () => {
         
         storageSpy.mockRestore();
     });
+
+    it('adds a similar product to cart and updates local storage', async () => {
+        const storageSpy = jest.spyOn(Storage.prototype, 'setItem');
+        axios.get.mockImplementation((url) => {
+            if (url.includes('/api/v1/product/get-product/hammer')) {
+                return Promise.resolve({ data: { product: mockProduct } });
+            }
+            if (url.includes('/api/v1/product/related-product/1/cat1')) {
+                return Promise.resolve({ data: { products: mockRelated } });
+            }
+            return Promise.reject(new Error('not found'));
+        });
+
+        const { getByText, getAllByText } = render(
+            <MemoryRouter initialEntries={['/product/hammer']}>
+                <Routes>
+                    <Route path="/product/:slug" element={<ProductDetails />} />
+                </Routes>
+            </MemoryRouter>
+        );
+
+        await waitFor(() => expect(getByText('Drill')).toBeInTheDocument());
+        
+        // There are two "ADD TO CART" buttons: one for Hammer, one for Drill.
+        const addCartButtons = getAllByText('ADD TO CART');
+        // The first one is for main product, second one is for similar product.
+        fireEvent.click(addCartButtons[1]);
+
+        expect(mockSetCart).toHaveBeenCalledWith([mockRelated[0]]);
+        expect(storageSpy).toHaveBeenCalledWith('cart', expect.stringContaining('drill'));
+        expect(toast.success).toHaveBeenCalledWith('Item Added to cart');
+        
+        storageSpy.mockRestore();
+    });
 });
