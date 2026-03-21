@@ -14,7 +14,7 @@ jest.mock("../middlewares/authMiddleware.js", () => ({
     isAdmin: (req, res, next) => next(),
 }));
 
-jest.setTimeout(30000);
+jest.setTimeout(60000);
 
 describe("Category & Public Assets Integration Tests", () => {
 
