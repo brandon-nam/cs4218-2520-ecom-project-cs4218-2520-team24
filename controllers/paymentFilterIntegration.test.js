@@ -217,4 +217,132 @@ describe("Backend Integration: Payments & Filters", () => {
      expect(payload.products.length).toBe(1);
      expect(payload.products[0].name).toBe("Integration Product");
   });
+
+  it("B8: should return 400 and NOT create order when Braintree returns result.success = false (card declined)", async () => {
+    // Arrange: Braintree resolves but with success: false (e.g. card declined)
+    braintree.mockSale.mockResolvedValueOnce({
+      success: false,
+      message: "Card Declined",
+      transaction: { id: "txn_declined" },
+    });
+
+    const req = {
+      user: { _id: testUser._id },
+      body: {
+        nonce: "fake-declined-nonce",
+        cart: [{ ...testProduct.toObject(), price: 150 }],
+      },
+    };
+    const res = { json: jest.fn(), status: jest.fn().mockReturnThis(), send: jest.fn() };
+
+    // Act
+    await brainTreePaymentController(req, res);
+
+    // Assert: should return 400 with decline message, NOT 500
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.send).toHaveBeenCalledWith({ message: "Card Declined" });
+
+    // Verify DB Side Effects - Order MUST NOT exist after declined payment
+    const ordersCount = await orderModel.countDocuments();
+    expect(ordersCount).toBe(0);
+  });
+
+  it("B9: failed payment should not mutate product quantity or state", async () => {
+    // Arrange: record original product state
+    const originalProduct = await productModel.findById(testProduct._id);
+    const originalQuantity = originalProduct.quantity;
+
+    braintree.mockSale.mockRejectedValueOnce(new Error("Gateway Timeout"));
+
+    const req = {
+      user: { _id: testUser._id },
+      body: { nonce: "fail-nonce", cart: [{ ...testProduct.toObject(), price: 150 }] },
+    };
+    const res = { status: jest.fn().mockReturnThis(), send: jest.fn() };
+
+    // Act
+    await brainTreePaymentController(req, res);
+
+    // Assert: product quantity remains unchanged
+    const productAfter = await productModel.findById(testProduct._id);
+    expect(productAfter.quantity).toBe(originalQuantity);
+    expect(productAfter.name).toBe(originalProduct.name);
+    expect(productAfter.price).toBe(originalProduct.price);
+  });
+
+  it("B10: should create order with multiple products correctly linked", async () => {
+    // Arrange: seed a second product
+    const secondProduct = await new productModel({
+      name: "Second Product",
+      slug: "second-product",
+      description: "Another test item",
+      price: 75,
+      category: new mongoose.Types.ObjectId(),
+      quantity: 3,
+    }).save();
+
+    braintree.mockSale.mockResolvedValueOnce({ success: true, transaction: { id: "txn_multi" } });
+
+    const req = {
+      user: { _id: testUser._id },
+      body: {
+        nonce: "fake-multi-nonce",
+        cart: [
+          { ...testProduct.toObject(), price: 150 },
+          { ...secondProduct.toObject(), price: 75 },
+        ],
+      },
+    };
+    const res = { json: jest.fn(), status: jest.fn().mockReturnThis(), send: jest.fn() };
+
+    // Act
+    await brainTreePaymentController(req, res);
+
+    // Assert
+    expect(res.json).toHaveBeenCalledWith({ ok: true });
+
+    // Verify the order links both products
+    const storedOrder = await orderModel.findOne({ buyer: testUser._id }).populate("products");
+    expect(storedOrder).not.toBeNull();
+    expect(storedOrder.products).toHaveLength(2);
+
+    const productIds = storedOrder.products.map((p) => p._id.toString());
+    expect(productIds).toContain(testProduct._id.toString());
+    expect(productIds).toContain(secondProduct._id.toString());
+
+    // Verify the total amount sent to Braintree was correct (150 + 75 = 225)
+    expect(braintree.mockSale).toHaveBeenCalledWith(
+      expect.objectContaining({ amount: 225 })
+    );
+  });
+
+  it("B11: filter with price range only (no category) returns correct products", async () => {
+    // Arrange: seed products at different price points
+    await new productModel({
+      name: "Budget Item",
+      slug: "budget-item",
+      description: "Cheap",
+      price: 25,
+      category: new mongoose.Types.ObjectId(),
+      quantity: 10,
+    }).save();
+
+    // testProduct is $150 (seeded in beforeEach)
+    const req = {
+      body: {
+        radio: [100, 200], // Price range filter only, no checked categories
+      },
+    };
+    const res = { status: jest.fn().mockReturnThis(), send: jest.fn() };
+
+    // Act
+    await productFiltersController(req, res);
+
+    // Assert
+    expect(res.status).toHaveBeenCalledWith(200);
+    const payload = res.send.mock.calls[0][0];
+    expect(payload.success).toBe(true);
+    expect(payload.products.length).toBe(1); // Only the $150 product, not the $25 one
+    expect(payload.products[0].name).toBe("Integration Product");
+  });
 });

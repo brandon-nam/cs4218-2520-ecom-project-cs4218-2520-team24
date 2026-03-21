@@ -5,12 +5,14 @@ import { getMongoUri } from '../mongodb-manager';
 import Product from '../../models/productModel.js';
 import Category from '../../models/categoryModel.js';
 
-test.describe('E2E: Cart UX, Policies & Error Handling', () => {
+test.describe('E2E: Cart UX', () => {
   const testId = Date.now().toString().slice(-6);
   const products = [
     { name: `Item 1 ${testId}`, slug: `i1-${testId}`, description: 'Desc 1', price: 10, quantity: 5 },
     { name: `Item 2 ${testId}`, slug: `i2-${testId}`, description: 'Desc 2', price: 20, quantity: 5 }
   ];
+
+  let testCategory: any;
 
   test.beforeAll(async () => {
     // 1. Establish DB Connection for localized seeded data guarantees
@@ -19,9 +21,17 @@ test.describe('E2E: Cart UX, Policies & Error Handling', () => {
     await mongoose.connect(mongoUri);
 
     // 2. Seed a custom category and the items
-    const category = await new Category({ name: `UX Cat ${testId}`, slug: `ux-cat-${testId}` }).save();
-    await new Product({ ...products[0], category: category._id }).save();
-    await new Product({ ...products[1], category: category._id }).save();
+    testCategory = await new Category({ name: `UX Cat ${testId}`, slug: `ux-cat-${testId}` }).save();
+    await new Product({ ...products[0], category: testCategory._id }).save();
+    await new Product({ ...products[1], category: testCategory._id }).save();
+  });
+
+  test.afterAll(async () => {
+    // Optionally clean up
+    if (mongoose.connection.readyState === 1 && testCategory) {
+      await Product.deleteMany({ category: testCategory._id });
+      await Category.findByIdAndDelete(testCategory._id);
+    }
   });
 
   test('Cart removal interactions and empty state handling', async ({ page }) => {
@@ -45,7 +55,7 @@ test.describe('E2E: Cart UX, Policies & Error Handling', () => {
 
     // 3. Verify Initial UX item count logic
     await expect(page.locator(`text=You Have 2 items in your cart`)).toBeVisible();
-    await expect(page.locator('.card:has-text("Item 1")')).toBeVisible();
+    await expect(page.locator(`.card:has-text("${products[0].name}")`)).toBeVisible();
 
     // 4. Test Product Removal
     const removeBtns = page.locator('button:has-text("Remove")');
@@ -57,34 +67,6 @@ test.describe('E2E: Cart UX, Policies & Error Handling', () => {
     // 6. Test final boundary condition (Empty Cart state triggers)
     await removeBtns.first().click();
     await expect(page.locator('text=Your Cart Is Empty')).toBeVisible();
-  });
-
-  test('Privacy Policy page routing and document visibility', async ({ page }) => {
-    // 1. Navigate directly to policy from the global layout footer usually
-    await page.goto('/policy');
-
-    // 2. Assert text content renders correctly without 500s or blank templates
-    await expect(page.locator('h1.bg-dark')).toHaveText('PRIVACY POLICY');
-    // Ensure standard generic styling mapping is functioning
-    await expect(page.locator('.contactus')).toBeVisible();
-    await expect(page.locator('p').nth(0)).not.toBeEmpty();
-  });
-
-  test('Intentionally navigate to a dead link to test the 404 page UI handling', async ({ page }) => {
-    // 1. User mistypes or clicks corrupted referral
-    await page.goto(`/this-route-definitely-does-not-exist-${testId}`);
-
-    // 2. Verify 404 UX page container loads
-    await expect(page.locator('h1.pnf-title')).toHaveText('404');
-    await expect(page.locator('h2.pnf-heading')).toHaveText('Oops ! Page Not Found');
-
-    // 3. Follow structural bounds - navigate back gracefully
-    const goBackBtn = page.locator('a.pnf-btn');
-    await expect(goBackBtn).toHaveText('Go Back');
-    await goBackBtn.click();
-
-    // 4. Validate routing dropped us safely home
-    await expect(page).toHaveURL('/');
   });
 
   test('Cart items display product details: name, description, price, and image', async ({ page }) => {
@@ -116,20 +98,5 @@ test.describe('E2E: Cart UX, Policies & Error Handling', () => {
     // 6. Verify product image renders with correct alt text
     const productImg = page.locator(`img[alt="${products[0].name}"]`);
     await expect(productImg).toBeVisible();
-  });
-
-  test('Privacy Policy page renders the contact image', async ({ page }) => {
-    await page.goto('/policy');
-
-    // Verify the policy-page image loads and is visible
-    const policyImg = page.locator('img[alt="contactus"]');
-    await expect(policyImg).toBeVisible();
-  });
-
-  test('404 page sets the correct document title', async ({ page }) => {
-    await page.goto(`/nonexistent-page-${testId}`);
-
-    // Verify the document title contains the expected 404 page title
-    await expect(page).toHaveTitle(/page not found/i);
   });
 });

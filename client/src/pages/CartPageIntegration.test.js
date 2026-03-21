@@ -139,4 +139,43 @@ describe("Frontend Integration: Cart Context & UI Behaviors", () => {
     // The checkout payment button should not be displayed when cart is empty
     expect(screen.queryByText(/Make Payment/i)).not.toBeInTheDocument();
   });
+
+  it("F6: authenticated user with no address should see Update Address button instead of login prompt", () => {
+    // Arrange: authenticated but address is empty/missing
+    const authNoAddress = { user: { name: "No Address User" }, token: "mock-token" };
+    renderIntegratedCartPage([mockItem1], authNoAddress);
+
+    // Assert: Update Address button should be visible
+    const updateBtn = screen.getByRole("button", { name: /Update Address/i });
+    expect(updateBtn).toBeInTheDocument();
+
+    // Assert: should NOT show "Please Login to checkout" (user is authenticated)
+    expect(screen.queryByText(/Please Login to checkout/i)).not.toBeInTheDocument();
+
+    // Assert: should NOT show "Current Address" section since there is no address
+    expect(screen.queryByText(/Current Address/i)).not.toBeInTheDocument();
+
+    // Act: Click Update Address should navigate to profile
+    fireEvent.click(updateBtn);
+    expect(mockNavigate).toHaveBeenCalledWith("/dashboard/user/profile");
+  });
+
+  it("F7: CartContext hydrates from localStorage on initial mount and renders items", () => {
+    // Arrange: Pre-populate localStorage before render to test useEffect hydration
+    const preloadedItems = [
+      { _id: "pre1", name: "Preloaded Widget", price: 200, description: "From storage" },
+      { _id: "pre2", name: "Preloaded Gadget", price: 300, description: "Also from storage" },
+    ];
+
+    // Render with preloaded cart (simulating a returning user with items in localStorage)
+    renderIntegratedCartPage(preloadedItems, mockAuthUser);
+
+    // Assert: CartContext useEffect should have read localStorage and the UI should display the items
+    expect(screen.getByText(/You Have 2 items in your cart/i)).toBeInTheDocument();
+    expect(screen.getByText("Preloaded Widget")).toBeInTheDocument();
+    expect(screen.getByText("Preloaded Gadget")).toBeInTheDocument();
+
+    // Assert: Subtotal should reflect the correct total ($200 + $300 = $500)
+    expect(screen.getByText(/Total : \$500.00/i)).toBeInTheDocument();
+  });
 });
